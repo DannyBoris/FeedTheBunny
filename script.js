@@ -5,6 +5,7 @@
   const SCORE_EL = selectEl("score-display");
   const TARGET_EL = selectEl("target");
   const ROUND_DISPLAY_EL = selectEl("round-time-display");
+  const PAUSE_BTN = selectEl("pause-timer");
 
   //APP CONSTANTS
   const WINNING_SCORE = 10;
@@ -25,8 +26,10 @@
   //INTERVALS
   let gameInterval;
   let itemInterval;
-  let currentRandomInterval;
+  let currentRandomTimeout;
   let itemTimer;
+  let specialItemTimeout;
+  let specialItemDragTimeout;
 
   //Drag and drop hanlders
   function enableDrag(id) {
@@ -92,6 +95,10 @@
     el.style.top = `${x}px`;
     el.style.left = `${y}px`;
     document.body.append(el);
+
+    setTimeout(() => {
+      enableDrag(NORMAL_ITEM);
+    }, ENABLE_DRAG_TIME);
   }
 
   //Pad timer with zeros
@@ -127,13 +134,21 @@
     itemCounterTime--;
   }
   //pauses the game
-  function pauseGame() {}
+  function pauseGame() {
+    clearInterval(gameInterval);
+    clearInterval(itemInterval);
+    clearInterval(itemTimer);
+
+    clearTimeout(currentRandomTimeout);
+    clearTimeout(specialItemTimeout);
+    clearTimeout(specialItemDragTimeout);
+    // how to reset an interval ??
+    PAUSE_BTN.textContent = "Resume";
+  }
   //Game over when times up or player won
   function gameOver() {
     const PLAYER_WON = score >= WINNING_SCORE;
     const TIME_UP = PLAYING_TIME.seconds === 0 && PLAYING_TIME.mins === 0;
-    console.log(score);
-    console.log(WINNING_SCORE);
     return TIME_UP || PLAYER_WON;
   }
 
@@ -149,6 +164,7 @@
   function init() {
     TARGET_EL.addEventListener("dragover", (e) => allowDrop(e));
     TARGET_EL.addEventListener("drop", (e) => drop(e));
+    PAUSE_BTN.addEventListener("click", () => pauseGame());
     createEl("img", NORMAL_ITEM, "disable-drag", "./carrot.png");
     generateRandomInterval();
     render();
@@ -160,9 +176,8 @@
   }
 
   function stopGame() {
-    clearInterval(gameInterval);
-    clearInterval(itemInterval);
-    clearInterval(itemTimer);
+    //Clears all intervals
+    pauseGame();
     let header = document.querySelector(".header");
     if (score === WINNING_SCORE) {
       header.innerHTML = "<h1>You won! Here's a fat happy bunny.</h1>";
@@ -197,26 +212,23 @@
       successfulRound = false;
       removeEl(NORMAL_ITEM);
       createEl("img", NORMAL_ITEM, "disable-drag", "./carrot.png");
-      setTimeout(() => {
-        enableDrag(NORMAL_ITEM);
-      }, ENABLE_DRAG_TIME);
     }, LIVING_TIME);
   }
 
   setInterval(() => {
-    clearTimeout(currentRandomInterval);
+    clearTimeout(currentRandomTimeout);
     generateRandomInterval();
   }, 30000);
 
   function generateRandomInterval() {
     let r = getRandomNumber(20, 30) * 1000;
     console.log(`Generating Super Carrot in: ${r / 1000} seconds.`);
-    currentRandomInterval = setTimeout(() => {
+    currentRandomTimeout = setTimeout(() => {
       createEl("img", SPECIAL_ITEM, "disable-drag", "./super-carrot.png");
-      setTimeout(() => {
+      specialItemTimeout = setTimeout(() => {
         enableDrag(SPECIAL_ITEM);
       }, ENABLE_DRAG_TIME);
-      setTimeout(() => {
+      specialItemDragTimeout = setTimeout(() => {
         removeEl(SPECIAL_ITEM);
       }, LIVING_TIME);
     }, r);
