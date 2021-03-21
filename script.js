@@ -181,11 +181,11 @@
     let header = document.querySelector(".header");
     if (score === WINNING_SCORE) {
       header.innerHTML = "<h1>You won! Here's a fat happy bunny.</h1>";
-      TARGET_EL.src = "./fat-bunny.jfif";
+      TARGET_EL.src = "./img/fat-bunny.jfif";
     } else {
       header.innerHTML =
         "<h1>You lost... Look what youv'e done to the bunny.</h1>";
-      TARGET_EL.src = "./dead-bunny.jfif";
+      TARGET_EL.src = "./img/dead-bunny.jfif";
       TARGET_EL.style.width = "300px";
     }
   }
@@ -211,7 +211,7 @@
       if (!successfulRound) handleFailedRound(1);
       successfulRound = false;
       removeEl(NORMAL_ITEM);
-      createEl("img", NORMAL_ITEM, "disable-drag", "./carrot.png");
+      createEl("img", NORMAL_ITEM, "disable-drag", "./img/carrot.png");
     }, LIVING_TIME);
   }
 
@@ -224,7 +224,7 @@
     let r = getRandomNumber(20, 30) * 1000;
     console.log(`Generating Super Carrot in: ${r / 1000} seconds.`);
     currentRandomTimeout = setTimeout(() => {
-      createEl("img", SPECIAL_ITEM, "disable-drag", "./super-carrot.png");
+      createEl("img", SPECIAL_ITEM, "disable-drag", "./img/super-carrot.png");
       specialItemTimeout = setTimeout(() => {
         enableDrag(SPECIAL_ITEM);
       }, ENABLE_DRAG_TIME);
